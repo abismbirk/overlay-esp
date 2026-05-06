@@ -8,19 +8,46 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
     private WindowManager wm;
-    private TextView v;
+    private View overlayView;
     private static final int REQUEST_CODE = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // واجهة بسيطة جدًا
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setGravity(Gravity.CENTER);
+
+        TextView info = new TextView(this);
+        info.setText("Overlay Active");
+        info.setTextSize(18);
+        layout.addView(info);
+
+        Button hideBtn = new Button(this);
+        hideBtn.setText("Hide App");
+        hideBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moveTaskToBack(true);
+            }
+        });
+        layout.addView(hideBtn);
+
+        setContentView(layout);
+
+        // فحص الصلاحية
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -30,40 +57,49 @@ public class MainActivity extends Activity {
             }
         }
 
+        // بدء النافذة العائمة
         showOverlay();
-        // لا تستدع finish() هنا
+        // إخفاء النشاط مباشرة لرؤية النافذة
+        moveTaskToBack(true);
     }
 
     private void showOverlay() {
-        if (wm != null) return; // تجنب الإضافة المزدوجة
+        if (wm != null) return;
 
-        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        try {
+            wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        v = new TextView(this);
-        v.setText("OK");
-        v.setTextColor(0xFF00FF00);
-        v.setBackgroundColor(0x88000000);
-        v.setPadding(20, 10, 20, 10);
+            TextView tv = new TextView(this);
+            tv.setText("OVERLAY WORKS!");
+            tv.setTextColor(0xFF00FF00);
+            tv.setBackgroundColor(0xAA000000);
+            tv.setPadding(30, 15, 30, 15);
+            tv.setTextSize(20);
 
-        int type;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            type = WindowManager.LayoutParams.TYPE_PHONE;
+            int type;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                type = WindowManager.LayoutParams.TYPE_PHONE;
+            }
+
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    type,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    PixelFormat.TRANSLUCENT);
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = 100;
+            params.y = 200;
+
+            wm.addView(tv, params);
+            overlayView = tv;
+        } catch (Exception e) {
+            Toast.makeText(this, "Overlay error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
-
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                type,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
-        params.gravity = Gravity.TOP | Gravity.START;
-        params.x = 100;
-        params.y = 200;
-
-        wm.addView(v, params);
     }
 
     @Override
@@ -73,22 +109,23 @@ public class MainActivity extends Activity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     Settings.canDrawOverlays(this)) {
                 showOverlay();
-                return;
+                moveTaskToBack(true);
+            } else {
+                Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
-        // إذا لم يتم منح الإذن، أغلق التطبيق
-        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (v != null && wm != null) {
+        if (overlayView != null && wm != null) {
             try {
-                wm.removeView(v);
+                wm.removeView(overlayView);
             } catch (Exception ignored) {}
         }
-        v = null;
+        overlayView = null;
         wm = null;
     }
 }
