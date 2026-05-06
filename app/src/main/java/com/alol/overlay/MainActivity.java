@@ -8,7 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
-import android.view.View;
+import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +17,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
     private static final int SCREEN_CAPTURE_CODE = 102;
+    private VirtualContainer container;
+    private SurfaceView surfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +28,21 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Hypervisor Protocol Ready");
+        info.setText("Neutronium Protocol Ready");
         info.setTextSize(18);
         layout.addView(info);
 
+        surfaceView = new SurfaceView(this);
+        layout.addView(surfaceView, 800, 600);
+
         Button startBtn = new Button(this);
-        startBtn.setText("Activate Virtual ESP");
+        startBtn.setText("Activate");
         startBtn.setOnClickListener(v -> requestAllPermissions());
         layout.addView(startBtn);
 
         setContentView(layout);
+        SpectralOverlay.init(surfaceView);
+        OmniTouch.init();
     }
 
     private void requestAllPermissions() {
@@ -51,15 +58,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == OVERLAY_CODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+        if (requestCode == OVERLAY_CODE && Settings.canDrawOverlays(this)) {
             requestAllPermissions();
         } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
-            Intent serviceIntent = new Intent(this, HypervisorService.class);
-            serviceIntent.putExtra("data", data);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent);
-            else startService(serviceIntent);
-            Toast.makeText(this, "Hypervisor is ALIVE!", Toast.LENGTH_SHORT).show();
-            moveTaskToBack(true);
+            MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            container = new VirtualContainer(surfaceView, mpManager, data);
+            Toast.makeText(this, "Neutronium Core Active", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (container != null) container.stop();
+        super.onDestroy();
     }
 }

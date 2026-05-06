@@ -1,33 +1,29 @@
 package com.alol.overlay;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.SurfaceHolder;
-import java.util.List;
+import android.view.SurfaceView;
 
 public class SpectralOverlay {
-    private static final Paint paint = new Paint();
-    private static List<float[]> targets;
-    private static int width, height;
+    private static SurfaceView surfaceView;
+    private static Canvas canvas;
 
-    public static void updateTargets(List<float[]> detections, int w, int h) {
-        targets = detections;
-        width = w;
-        height = h;
+    public static void init(SurfaceView view) {
+        surfaceView = view;
     }
 
-    public static void draw(Canvas canvas) {
-        if (targets == null) return;
-        canvas.save();
-        // قلب الإحداثيات لتناسب العرض
-        canvas.scale(1, -1, width / 2f, height / 2f);
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
-        for (float[] box : targets) {
-            canvas.drawRect(box[0], box[1], box[2], box[3], paint);
+    public static Canvas getCanvas() {
+        if (surfaceView != null) {
+            SurfaceHolder holder = surfaceView.getHolder();
+            canvas = holder.lockCanvas();
         }
-        canvas.restore();
+        return canvas;
+    }
+
+    public static void release() {
+        if (canvas != null && surfaceView != null) {
+            surfaceView.getHolder().unlockCanvasAndPost(canvas);
+            canvas = null;
+        }
     }
 }
