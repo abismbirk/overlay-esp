@@ -20,6 +20,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class BackgroundService extends Service {
+
+    // تعريف فئة Player هنا
+    public static class Player {
+        public float x, y;
+        public boolean isBot;
+        public String name;
+        public int teamId;
+        public float health;
+        public float distance;
+    }
+
     public static final List<Player> players = new ArrayList<>();
     public static final Object lock = new Object();
     private Handler handler;
