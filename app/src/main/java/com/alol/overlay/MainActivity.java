@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
+    private SystemUIParasite parasite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,31 +24,30 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Consciousness Ready");
+        info.setText("Hive Mind Ready");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Intercept Reality");
-        startBtn.setOnClickListener(v -> requestPermissions());
+        startBtn.setText("Deploy Parasite");
+        startBtn.setOnClickListener(v -> requestOverlayPermission());
         layout.addView(startBtn);
 
         setContentView(layout);
     }
 
-    private void requestPermissions() {
+    private void requestOverlayPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERLAY_CODE);
             return;
         }
-        startVpnService();
+        deploy();
     }
 
-    private void startVpnService() {
-        Intent intent = new Intent(this, ConsciousnessVPN.class);
-        startService(intent);
-        Toast.makeText(this, "Consciousness Interception Active", Toast.LENGTH_SHORT).show();
+    private void deploy() {
+        parasite = new SystemUIParasite(this);
+        Toast.makeText(this, "Parasite Deployed", Toast.LENGTH_SHORT).show();
         moveTaskToBack(true);
     }
 
@@ -55,7 +55,13 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OVERLAY_CODE && Settings.canDrawOverlays(this)) {
-            startVpnService();
+            deploy();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (parasite != null) parasite.stop();
+        super.onDestroy();
     }
 }
