@@ -2,6 +2,7 @@ package com.alol.overlay;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,11 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import dev.rikka.shizuku.Shizuku;
-import dev.rikka.shizuku.ShizukuProvider;
-
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
+    private static final int SCREEN_CAPTURE_CODE = 102;
+    private static Intent screenCaptureData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +28,12 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Hawk Eye Protocol Ready");
+        info.setText("AI ESP - Omega Protocol");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Activate Hawk Eye");
+        startBtn.setText("Activate AI ESP");
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,40 +46,14 @@ public class MainActivity extends Activity {
     }
 
     private void requestAllPermissions() {
-        // 1. صلاحية النافذة العائمة
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERLAY_CODE);
             return;
         }
-
-        // 2. صلاحية Shizuku
-        if (!Shizuku.isPreV11() || !Shizuku.checkSelfPermission()) {
-            Shizuku.requestPermission(0);
-            Toast.makeText(this, "Please grant Shizuku permission", Toast.LENGTH_LONG).show();
-        } else {
-            startServices();
-        }
-    }
-
-    private void startServices() {
-        Intent bgIntent = new Intent(this, BackgroundService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(bgIntent);
-        } else {
-            startService(bgIntent);
-        }
-
-        Intent hawkIntent = new Intent(this, HawkEyeService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(hawkIntent);
-        } else {
-            startService(hawkIntent);
-        }
-
-        Toast.makeText(this, "Hawk Eye is watching...", Toast.LENGTH_SHORT).show();
-        moveTaskToBack(true);
+        MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(mpManager.createScreenCaptureIntent(), SCREEN_CAPTURE_CODE);
     }
 
     @Override
@@ -92,6 +66,29 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
                 finish();
             }
+        } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
+            screenCaptureData = data;
+            startServices();
         }
+    }
+
+    private void startServices() {
+        Intent bgIntent = new Intent(this, BackgroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(bgIntent);
+        } else {
+            startService(bgIntent);
+        }
+
+        Intent aiIntent = new Intent(this, AIDetectionService.class);
+        aiIntent.putExtra("data", screenCaptureData);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(aiIntent);
+        } else {
+            startService(aiIntent);
+        }
+
+        Toast.makeText(this, "AI ESP is ALIVE!", Toast.LENGTH_SHORT).show();
+        moveTaskToBack(true);
     }
 }
