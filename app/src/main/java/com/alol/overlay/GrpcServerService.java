@@ -10,12 +10,13 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.alol.overlay.proto.EspServiceGrpc;
-import com.alol.overlay.proto.Esp;
-
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import io.grpc.BindableService;
+
+import com.alol.overlay.proto.EspServiceGrpc;
+import com.alol.overlay.proto.Esp;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +56,7 @@ public class GrpcServerService extends Service {
         new Thread(() -> {
             try {
                 grpcServer = ServerBuilder.forPort(50051)
-                        .addService(new EspServiceImpl())
+                        .addService((BindableService) new EspServiceImpl())
                         .build()
                         .start();
                 Log.d(TAG, "gRPC Server started on port 50051");
@@ -66,14 +67,12 @@ public class GrpcServerService extends Service {
         }).start();
     }
 
-    // تطبيق خدمة ESP
     private static class EspServiceImpl extends EspServiceGrpc.EspServiceImplBase {
         @Override
         public StreamObserver<Esp.EspRequest> streamEspData(StreamObserver<Esp.EspResponse> responseObserver) {
             return new StreamObserver<Esp.EspRequest>() {
                 @Override
                 public void onNext(Esp.EspRequest request) {
-                    // معالجة بيانات اللاعبين من اللعبة
                     synchronized (BackgroundService.lock) {
                         BackgroundService.players.clear();
                         for (Esp.Player p : request.getPlayersList()) {
@@ -88,19 +87,13 @@ public class GrpcServerService extends Service {
                             BackgroundService.players.add(player);
                         }
                     }
-                    // رد فارغ (يمكن استخدامه لإرسال أوامر التصويب لاحقاً)
                     responseObserver.onNext(Esp.EspResponse.newBuilder().setDrawEsp(true).build());
                 }
 
                 @Override
-                public void onError(Throwable t) {
-                    Log.e(TAG, "gRPC Stream error", t);
-                }
-
+                public void onError(Throwable t) { Log.e(TAG, "gRPC Stream error", t); }
                 @Override
-                public void onCompleted() {
-                    responseObserver.onCompleted();
-                }
+                public void onCompleted() { responseObserver.onCompleted(); }
             };
         }
     }
@@ -109,11 +102,8 @@ public class GrpcServerService extends Service {
     public void onDestroy() {
         if (grpcServer != null) {
             grpcServer.shutdown();
-            try {
-                grpcServer.awaitTermination(1, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            try { grpcServer.awaitTermination(1, TimeUnit.SECONDS); }
+            catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }
         super.onDestroy();
     }
