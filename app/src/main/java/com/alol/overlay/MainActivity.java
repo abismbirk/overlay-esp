@@ -17,6 +17,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
     private static final int SCREEN_CAPTURE_CODE = 102;
+    private static Intent screenCaptureData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,23 +71,28 @@ public class MainActivity extends Activity {
                 finish();
             }
         } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
-            // بدء خدمة الخلفية والخدمة الجديدة لالتقاط الشاشة
-            Intent bgIntent = new Intent(this, BackgroundService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(bgIntent);
-            } else {
-                startService(bgIntent);
-            }
-
-            Intent captureIntent = new Intent(this, ScreenCaptureService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(captureIntent);
-            } else {
-                startService(captureIntent);
-            }
-
-            Toast.makeText(this, "Capture Engine Started", Toast.LENGTH_SHORT).show();
-            moveTaskToBack(true);
+            screenCaptureData = data;
+            startServices();
         }
+    }
+
+    private void startServices() {
+        Intent bgIntent = new Intent(this, BackgroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(bgIntent);
+        } else {
+            startService(bgIntent);
+        }
+
+        Intent captureIntent = new Intent(this, ScreenCaptureService.class);
+        captureIntent.putExtra("data", screenCaptureData);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(captureIntent);
+        } else {
+            startService(captureIntent);
+        }
+
+        Toast.makeText(this, "Capture Engine Started", Toast.LENGTH_SHORT).show();
+        moveTaskToBack(true);
     }
 }

@@ -63,7 +63,7 @@ public class ScreenCaptureService extends Service {
     public void startProjection(Intent data) {
         if (data == null) return;
         MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-        mediaProjection = mpManager.getMediaProjection(Activity.RESULT_OK, data);
+        mediaProjection = mpManager.getMediaProjection(-1, data);
         createVirtualDisplay();
     }
 
