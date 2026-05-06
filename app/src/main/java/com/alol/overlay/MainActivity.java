@@ -28,12 +28,12 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Spectrum Capture Ready");
+        info.setText("ETERNAL VISION PROTOCOL");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Activate Capture & Overlay");
+        startBtn.setText("Activate AI ESP");
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,15 +46,12 @@ public class MainActivity extends Activity {
     }
 
     private void requestAllPermissions() {
-        // 1. صلاحية النافذة العائمة (Overlay)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERLAY_CODE);
             return;
         }
-
-        // 2. صلاحية التقاط الشاشة (Screen Capture)
         MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         startActivityForResult(mpManager.createScreenCaptureIntent(), SCREEN_CAPTURE_CODE);
     }
@@ -62,7 +59,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == OVERLAY_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
                 requestAllPermissions();
@@ -84,15 +80,15 @@ public class MainActivity extends Activity {
             startService(bgIntent);
         }
 
-        Intent captureIntent = new Intent(this, ScreenCaptureService.class);
-        captureIntent.putExtra("data", screenCaptureData);
+        Intent aiIntent = new Intent(this, AIDetectionService.class);
+        aiIntent.putExtra("data", screenCaptureData);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(captureIntent);
+            startForegroundService(aiIntent);
         } else {
-            startService(captureIntent);
+            startService(aiIntent);
         }
 
-        Toast.makeText(this, "Capture Engine Started", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "AI ESP is ALIVE!", Toast.LENGTH_SHORT).show();
         moveTaskToBack(true);
     }
 }
