@@ -17,29 +17,22 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
     private static final int SCREEN_CAPTURE_CODE = 102;
-    private static Intent screenCaptureData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("AI ESP - Omega Protocol");
+        info.setText("Hypervisor Protocol Ready");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Activate AI ESP");
-        startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestAllPermissions();
-            }
-        });
+        startBtn.setText("Activate Virtual ESP");
+        startBtn.setOnClickListener(v -> requestAllPermissions());
         layout.addView(startBtn);
 
         setContentView(layout);
@@ -47,8 +40,7 @@ public class MainActivity extends Activity {
 
     private void requestAllPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERLAY_CODE);
             return;
         }
@@ -59,36 +51,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == OVERLAY_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-                requestAllPermissions();
-            } else {
-                Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        if (requestCode == OVERLAY_CODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+            requestAllPermissions();
         } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
-            screenCaptureData = data;
-            startServices();
+            Intent serviceIntent = new Intent(this, HypervisorService.class);
+            serviceIntent.putExtra("data", data);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent);
+            else startService(serviceIntent);
+            Toast.makeText(this, "Hypervisor is ALIVE!", Toast.LENGTH_SHORT).show();
+            moveTaskToBack(true);
         }
-    }
-
-    private void startServices() {
-        Intent bgIntent = new Intent(this, BackgroundService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(bgIntent);
-        } else {
-            startService(bgIntent);
-        }
-
-        Intent aiIntent = new Intent(this, AIDetectionService.class);
-        aiIntent.putExtra("data", screenCaptureData);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(aiIntent);
-        } else {
-            startService(aiIntent);
-        }
-
-        Toast.makeText(this, "AI ESP is ALIVE!", Toast.LENGTH_SHORT).show();
-        moveTaskToBack(true);
     }
 }
