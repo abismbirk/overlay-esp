@@ -14,10 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import dev.rikka.shizuku.Shizuku;
-
 public class MainActivity extends Activity {
     private static final int OVERLAY_CODE = 101;
+    private static final int SCREEN_CAPTURE_CODE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +27,12 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Spectrum Protocol Ready");
+        info.setText("Spectrum Capture Ready");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Activate Spectrum");
+        startBtn.setText("Activate Capture & Overlay");
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,38 +53,15 @@ public class MainActivity extends Activity {
             return;
         }
 
-        // 2. صلاحية Shizuku
-        if (!Shizuku.isPreV11() || !Shizuku.checkSelfPermission()) {
-            Toast.makeText(this, "Please install and run Shizuku first!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // 3. بدء خدمات الطيف
-        startServices();
-    }
-
-    private void startServices() {
-        Intent lungIntent = new Intent(this, GhostLungService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(lungIntent);
-        } else {
-            startService(lungIntent);
-        }
-
-        Intent bgIntent = new Intent(this, BackgroundService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(bgIntent);
-        } else {
-            startService(bgIntent);
-        }
-
-        Toast.makeText(this, "The Ultimate Spectrum is ALIVE!", Toast.LENGTH_SHORT).show();
-        moveTaskToBack(true);
+        // 2. صلاحية التقاط الشاشة (Screen Capture)
+        MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(mpManager.createScreenCaptureIntent(), SCREEN_CAPTURE_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == OVERLAY_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
                 requestAllPermissions();
@@ -93,6 +69,24 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
                 finish();
             }
+        } else if (requestCode == SCREEN_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
+            // بدء خدمة الخلفية والخدمة الجديدة لالتقاط الشاشة
+            Intent bgIntent = new Intent(this, BackgroundService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(bgIntent);
+            } else {
+                startService(bgIntent);
+            }
+
+            Intent captureIntent = new Intent(this, ScreenCaptureService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(captureIntent);
+            } else {
+                startService(captureIntent);
+            }
+
+            Toast.makeText(this, "Capture Engine Started", Toast.LENGTH_SHORT).show();
+            moveTaskToBack(true);
         }
     }
 }
