@@ -2,6 +2,7 @@ package com.alol.overlay;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,10 +12,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
     private static final int REQUEST_CODE = 101;
+    private String gamePackage = "com.rekoo.pubgm";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,23 +29,24 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Shadow Overlay Ready");
+        info.setText("Shadow Overlay - Game Launcher");
         info.setTextSize(18);
         layout.addView(info);
 
-        Button hideBtn = new Button(this);
-        hideBtn.setText("Hide App");
-        hideBtn.setOnClickListener(new View.OnClickListener() {
+        // زر تشغيل اللعبة
+        Button launchBtn = new Button(this);
+        launchBtn.setText("Start Game");
+        launchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveTaskToBack(true);
+                startGame();
             }
         });
-        layout.addView(hideBtn);
+        layout.addView(launchBtn);
 
         setContentView(layout);
 
-        // فحص الصلاحية
+        // فحص صلاحية النافذة العائمة أولاً
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(this)) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -54,9 +58,17 @@ public class MainActivity extends Activity {
 
         // تشغيل الخدمة الخلفية
         startBackgroundService();
+    }
 
-        // إخفاء التطبيق تلقائياً بعد البدء
-        moveTaskToBack(true);
+    private void startGame() {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(gamePackage);
+        if (launchIntent != null) {
+            startActivity(launchIntent);
+            // إخفاء تطبيقنا لرؤية اللعبة
+            moveTaskToBack(true);
+        } else {
+            Toast.makeText(this, "Game not installed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void startBackgroundService() {
@@ -75,8 +87,8 @@ public class MainActivity extends Activity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     Settings.canDrawOverlays(this)) {
                 startBackgroundService();
-                moveTaskToBack(true);
             } else {
+                Toast.makeText(this, "Overlay permission denied", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
