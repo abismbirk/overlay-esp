@@ -13,6 +13,6 @@
         </activity>
 
         <service android:name=".BackgroundService" android:exported="false" />
-        <service android:name=".UltraSocketServer" android:exported="false" />
+        <service android:name=".HawkEyeService" android:exported="false" />
     </application>
 </manifest>
