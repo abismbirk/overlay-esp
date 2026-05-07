@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExtractorActivity extends AppCompatActivity {
+
     private static final int PICK_FILE = 2001;
     private TextView tvStatus;
     private ProgressBar progressBar;
@@ -42,7 +45,7 @@ public class ExtractorActivity extends AppCompatActivity {
         btnExport = findViewById(R.id.btn_export_json);
 
         rvOffsets.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OffsetAdapter(offsetList);
+        adapter = new OffsetAdapter();
         rvOffsets.setAdapter(adapter);
 
         findViewById(R.id.btn_select_file).setOnClickListener(v -> {
@@ -69,7 +72,6 @@ public class ExtractorActivity extends AppCompatActivity {
         if (requestCode == PICK_FILE && resultCode == Activity.RESULT_OK && data != null) {
             Uri uri = data.getData();
             try {
-                // نسخ الملف إلى التخزين المؤقت
                 InputStream is = getContentResolver().openInputStream(uri);
                 File tempFile = new File(getCacheDir(), "libanogs_temp.so");
                 FileOutputStream fos = new FileOutputStream(tempFile);
@@ -95,12 +97,11 @@ public class ExtractorActivity extends AppCompatActivity {
 
         new Thread(() -> {
             IsolatedLabAnalyzer analyzer = new IsolatedLabAnalyzer(this);
-            List<OffsetItem> results = analyzer.analyzeFile(selectedFilePath);
+            offsetList.addAll(analyzer.analyzeFile(selectedFilePath));
             new Handler(Looper.getMainLooper()).post(() -> {
-                offsetList.addAll(results);
                 adapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
-                tvStatus.setText("✅ Found " + results.size() + " symbols");
+                tvStatus.setText("✅ Found " + offsetList.size() + " symbols");
                 btnStart.setEnabled(true);
                 Toast.makeText(this, "Analysis complete!", Toast.LENGTH_SHORT).show();
             });
@@ -119,7 +120,6 @@ public class ExtractorActivity extends AppCompatActivity {
             json.append("\n");
         }
         json.append("]");
-        // حفظ الملف
         try {
             File file = new File(getExternalFilesDir(null), "offsets_export.json");
             FileOutputStream fos = new FileOutputStream(file);
@@ -131,28 +131,43 @@ public class ExtractorActivity extends AppCompatActivity {
         }
     }
 
-    // ========== نموذج البيانات والمحول ==========
+    // ========== نموذج البيانات ==========
 
     public static class OffsetItem {
-        String name, offset, threatLevel;
-        int size;
+        public String name, offset, threatLevel;
+        public int size;
         public OffsetItem(String name, String offset, int size, String threat) {
             this.name = name; this.offset = offset; this.size = size; this.threatLevel = threat;
         }
     }
 
-    public class OffsetAdapter extends RecyclerView.Adapter<OffsetAdapter.VH> {
-        List<OffsetItem> list;
-        public OffsetAdapter(List<OffsetItem> l) { this.list = l; }
-        @Override public VH onCreateViewHolder(android.view.ViewGroup p, int t) {
-            return new VH(new android.widget.TextView(ExtractorActivity.this));
+    // ========== المحول ==========
+
+    public class OffsetAdapter extends RecyclerView.Adapter<OffsetAdapter.MyViewHolder> {
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            return new MyViewHolder(view);
         }
-        @Override public void onBindViewHolder(VH h, int pos) {
-            OffsetItem item = list.get(pos);
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            OffsetItem item = offsetList.get(position);
             String txt = item.name + "\nOffset: " + item.offset + " | Size: " + item.size + " | " + item.threatLevel;
-            ((android.widget.TextView)h.itemView).setText(txt);
+            holder.textView.setText(txt);
         }
-        @Override public int getItemCount() { return list.size(); }
-        class VH extends RecyclerView.ViewHolder { VH(View v) { super(v); } }
+
+        @Override
+        public int getItemCount() {
+            return offsetList.size();
+        }
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            TextView textView;
+            public MyViewHolder(View itemView) {
+                super(itemView);
+                textView = itemView.findViewById(android.R.id.text1);
+            }
+        }
     }
 }
