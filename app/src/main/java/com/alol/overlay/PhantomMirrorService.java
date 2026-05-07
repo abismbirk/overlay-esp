@@ -28,61 +28,47 @@ public class PhantomMirrorService extends Service {
     private ImageReader imageReader;
     private Handler backgroundHandler;
     private int width, height, density;
-    private boolean isRunning = false;
 
     @Override public IBinder onBind(Intent intent) { return null; }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        HandlerThread thread = new HandlerThread("PhantomMirrorThread");
+        HandlerThread thread = new HandlerThread("PhantomMirror");
         thread.start();
         backgroundHandler = new Handler(thread.getLooper());
-
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getRealMetrics(metrics);
         width = metrics.widthPixels;
         height = metrics.heightPixels;
         density = metrics.densityDpi;
-        startForegroundService();
     }
 
-    private void startForegroundService() {
-        String channelId = "phantom_channel";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId, "Phantom Mirror", NotificationManager.IMPORTANCE_LOW);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.hasExtra("data")) {
+            Intent data = intent.getParcelableExtra("data");
+            startMirroring(data);
         }
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pending = PendingIntent.getActivity(this, 0, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
-        startForeground(10, new Notification.Builder(this, channelId)
-                .setContentTitle("Phantom Mirror Active")
-                .setContentText("Receiving frames...")
-                .setSmallIcon(android.R.drawable.ic_menu_camera)
-                .setContentIntent(pending)
-                .build());
+        return START_STICKY;
     }
 
-    public void startMirroring(Intent data) {
-        if (isRunning) return;
+    private void startMirroring(Intent data) {
         MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         mediaProjection = mpManager.getMediaProjection(-1, data);
-
         imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2);
         imageReader.setOnImageAvailableListener(reader -> {
             Image image = reader.acquireLatestImage();
             if (image != null) {
-                Log.d(TAG, "Frame received: " + image.getWidth() + "x" + image.getHeight());
+                Log.d(TAG, "Frame captured for ACVS");
                 image.close();
             }
         }, backgroundHandler);
-
         phantomDisplay = mediaProjection.createVirtualDisplay("PhantomMirror",
                 width, height, density,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 imageReader.getSurface(), null, backgroundHandler);
-        isRunning = true;
     }
 
     @Override
