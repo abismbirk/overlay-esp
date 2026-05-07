@@ -18,19 +18,15 @@ public class MainActivity extends Activity {
         layout.setGravity(Gravity.CENTER);
 
         TextView info = new TextView(this);
-        info.setText("Shadow Server Ready");
+        info.setText("Observer Protocol Ready");
         info.setTextSize(18);
         layout.addView(info);
 
         Button startBtn = new Button(this);
-        startBtn.setText("Start Server");
+        startBtn.setText("Start Observation");
         startBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ShadowServer.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            } else {
-                startService(intent);
-            }
+            Intent intent = new Intent(this, PacketInterceptor.class);
+            startService(intent);
         });
         layout.addView(startBtn);
 
