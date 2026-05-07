@@ -3,13 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- طبقة الخلفية الحية -->
     <com.alol.overlay.ui.LiquidSurfaceView
         android:id="@+id/liquidBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- طبقة الأزرار الزجاجية -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -52,8 +50,8 @@
             <Button android:id="@+id/btn_cbg" style="@style/GlassButton" android:text="🤖 مصنع العباقرة (CBG)" />
             <Button android:id="@+id/btn_per" style="@style/GlassButton" android:text="💓 مُحلل المشاعر (PER)" />
             <Button android:id="@+id/btn_ibp" style="@style/GlassButton" android:text="♾️ بروتوكول الخلود (IBP)" />
+            <!-- الزر الجديد -->
             <Button android:id="@+id/btn_tva" style="@style/GlassButton" android:text="🔬 Threat Vector Analyzer" />
-
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
