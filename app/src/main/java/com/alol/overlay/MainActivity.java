@@ -1,10 +1,9 @@
 package com.alol.overlay;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,16 +11,12 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_MEDIA_PROJECTION = 1001;
     private static final int REQUEST_VPN = 1002;
     private static final int REQUEST_OVERLAY = 1003;
-    private static final int REQUEST_USAGE_STATS = 1004;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
     // ========== معالجات الأزرار ==========
 
     public void onAcvsClick(View v) {
-        requestMediaProjection();
+        MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        if (mpManager != null) {
+            startActivityForResult(mpManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+        }
     }
 
     public void onEtaClick(View v) {
@@ -52,76 +50,55 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null) {
             startActivityForResult(intent, REQUEST_VPN);
         } else {
-            startVpnService();
+            startService(new Intent(this, PacketInterceptor.class));
+            Toast.makeText(this, "🌐 ETA Activated", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void onVseClick(View v) {
-        checkOverlayPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_OVERLAY);
+        } else {
+            Toast.makeText(this, "🧪 VSE Ready", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onRavClick(View v) {
-        Toast.makeText(this, "🛡️ جارٍ تفعيل الحماية الذاتية...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "🛡️ Self-Healing Armor Active", Toast.LENGTH_SHORT).show();
     }
 
     public void onUedClick(View v) {
-        Toast.makeText(this, "📚 جارٍ تحميل قاعدة بيانات الثغرات...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "📚 Accessing Universal Exploit Database...", Toast.LENGTH_SHORT).show();
     }
 
     public void onIgaClick(View v) {
-        Toast.makeText(this, "🧠 جارٍ تشغيل المساعد الذكي...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "🧠 Intelligent Game Assistant is listening...", Toast.LENGTH_SHORT).show();
     }
 
     public void onDaeClick(View v) {
-        Toast.makeText(this, "💰 جارٍ فتح سوق الظل...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "💰 Entering Shadow Asset Exchange...", Toast.LENGTH_SHORT).show();
     }
 
     public void onCbgClick(View v) {
-        Toast.makeText(this, "🤖 جارٍ تشغيل مصنع العباقرة...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "🤖 Custom Persona Factory booting up...", Toast.LENGTH_SHORT).show();
     }
 
     public void onPerClick(View v) {
-        Toast.makeText(this, "💓 جارٍ تحليل المشاعر...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "💓 Scanning vitals...", Toast.LENGTH_SHORT).show();
     }
 
     public void onIbpClick(View v) {
-        Toast.makeText(this, "♾️ جارٍ تفعيل بروتوكول الخلود...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "♾️ Quantum Backup Initialized", Toast.LENGTH_SHORT).show();
     }
 
-    // ========== منطق الأذونات والخدمات ==========
-
-    private void requestMediaProjection() {
-        MediaProjectionManager mpManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-        if (mpManager != null) {
-            startActivityForResult(mpManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
-        }
-    }
-
-    private void startVpnService() {
-        Intent intent = new Intent(this, PacketInterceptor.class);
-        startService(intent);
-        Toast.makeText(this, "🌐 تم بدء اعتراض الحزم", Toast.LENGTH_SHORT).show();
-    }
-
-    private void checkOverlayPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    android.net.Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, REQUEST_OVERLAY);
-        } else {
-            startVirtualSandbox();
-        }
-    }
-
-    private void startVirtualSandbox() {
-        Toast.makeText(this, "🧪 بيئة الاختبار الافتراضية جاهزة", Toast.LENGTH_SHORT).show();
-    }
+    // ========== نتائج الأذونات ==========
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_MEDIA_PROJECTION && resultCode == Activity.RESULT_OK) {
-            // بدء خدمة المرآة
             Intent serviceIntent = new Intent(this, PhantomMirrorService.class);
             serviceIntent.putExtra("data", data);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,9 +106,12 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 startService(serviceIntent);
             }
-            Toast.makeText(this, "👁️ تم تفعيل العين الإلهية", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "👁️ Phantom Mirror Activated", Toast.LENGTH_SHORT).show();
         } else if (requestCode == REQUEST_VPN && resultCode == Activity.RESULT_OK) {
-            startVpnService();
+            startService(new Intent(this, PacketInterceptor.class));
+            Toast.makeText(this, "🌐 VPN Interceptor Started", Toast.LENGTH_SHORT).show();
+        } else if (requestCode == REQUEST_OVERLAY) {
+            Toast.makeText(this, "🧪 VSE Permission Granted", Toast.LENGTH_SHORT).show();
         }
     }
 }

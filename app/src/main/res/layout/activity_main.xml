@@ -1,137 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0A0A1A">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- طبقة الخلفية الحية -->
+    <com.alol.overlay.ui.LiquidSurfaceView
+        android:id="@+id/liquidBackground"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="20dp">
+        android:layout_height="match_parent" />
 
-        <!-- العنوان الرئيسي -->
-        <TextView
-            android:layout_width="wrap_content"
+    <!-- طبقة الأزرار الزجاجية -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LEGION OS"
-            android:textSize="36sp"
-            android:textColor="#00FFD1"
-            android:textStyle="bold"
-            android:shadowColor="#00FFD1"
-            android:shadowRadius="20"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="10dp" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="24dp"
+            android:paddingTop="60dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Shadow Command Center"
-            android:textSize="14sp"
-            android:textColor="#80FFFFFF"
-            android:layout_marginBottom="40dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LEGION OS"
+                android:textSize="38sp"
+                android:textColor="#00FFD1"
+                android:textStyle="bold"
+                android:shadowColor="#00FFD1"
+                android:shadowRadius="25"
+                android:layout_marginBottom="6dp" />
 
-        <!-- الأزرار الرئيسية -->
-        <Button
-            android:id="@+id/btn_acvs"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="👁️ العين الإلهية (ACVS)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shadow Command Center"
+                android:textSize="14sp"
+                android:textColor="#80FFFFFF"
+                android:layout_marginBottom="36dp" />
 
-        <Button
-            android:id="@+id/btn_eta"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="🌐 مُحلل حركة المرور (ETA)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
+            <Button android:id="@+id/btn_acvs" style="@style/GlassButton" android:text="👁️ العين الإلهية (ACVS)" />
+            <Button android:id="@+id/btn_eta" style="@style/GlassButton" android:text="🌐 مُحلل حركة المرور (ETA)" />
+            <Button android:id="@+id/btn_vse" style="@style/GlassButton" android:text="🧪 بيئة الاختبار الافتراضية (VSE)" />
+            <Button android:id="@+id/btn_rav" style="@style/GlassButton" android:text="🛡️ الحماية الذاتية (RAV)" />
+            <Button android:id="@+id/btn_ued" style="@style/GlassButton" android:text="📚 قاعدة بيانات الثغرات (UED)" />
+            <Button android:id="@+id/btn_iga" style="@style/GlassButton" android:text="🧠 المساعد الذكي (IGA)" />
+            <Button android:id="@+id/btn_dae" style="@style/GlassButton" android:text="💰 سوق الظل (DAE)" />
+            <Button android:id="@+id/btn_cbg" style="@style/GlassButton" android:text="🤖 مصنع العباقرة (CBG)" />
+            <Button android:id="@+id/btn_per" style="@style/GlassButton" android:text="💓 مُحلل المشاعر (PER)" />
+            <Button android:id="@+id/btn_ibp" style="@style/GlassButton" android:text="♾️ بروتوكول الخلود (IBP)" />
 
-        <Button
-            android:id="@+id/btn_vse"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="🧪 بيئة الاختبار الافتراضية (VSE)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_rav"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="🛡️ الحماية الذاتية (RAV)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_ued"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="📚 قاعدة بيانات الثغرات (UED)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_iga"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="🧠 المساعد الذكي (IGA)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_dae"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="💰 سوق الظل (DAE)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_cbg"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="🤖 مصنع العباقرة (CBG)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_per"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="💓 مُحلل المشاعر (PER)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-        <Button
-            android:id="@+id/btn_ibp"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="♾️ بروتوكول الخلود (IBP)"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/glass_button_bg"
-            android:layout_marginBottom="12dp"
-            android:textSize="15sp" />
-
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
