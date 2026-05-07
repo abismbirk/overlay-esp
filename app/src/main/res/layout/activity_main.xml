@@ -50,7 +50,7 @@
             <Button android:id="@+id/btn_cbg" style="@style/GlassButton" android:text="🤖 مصنع العباقرة (CBG)" />
             <Button android:id="@+id/btn_per" style="@style/GlassButton" android:text="💓 مُحلل المشاعر (PER)" />
             <Button android:id="@+id/btn_ibp" style="@style/GlassButton" android:text="♾️ بروتوكول الخلود (IBP)" />
-            <!-- الزر الجديد -->
+            <Button android:id="@+id/btn_shizuku" style="@style/GlassButton" android:text="Shizuku Spectre"/><!-- الزر الجديد -->
             <Button android:id="@+id/btn_tva" style="@style/GlassButton" android:text="🔬 Threat Vector Analyzer" />
         </LinearLayout>
     </ScrollView>
