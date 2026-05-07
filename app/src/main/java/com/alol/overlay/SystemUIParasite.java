@@ -8,6 +8,7 @@ import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.DisplayMetrics;
+import android.view.SurfaceView;
 import android.view.WindowManager;
 
 public class SystemUIParasite {
@@ -16,7 +17,7 @@ public class SystemUIParasite {
     private Handler backgroundHandler;
     private int width, height, density;
 
-    public SystemUIParasite(Context context) {
+    public SystemUIParasite(Context context, SurfaceView surfaceView) {
         HandlerThread thread = new HandlerThread("Phantom");
         thread.start();
         backgroundHandler = new Handler(thread.getLooper());
@@ -39,7 +40,7 @@ public class SystemUIParasite {
 
         DisplayManager dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
         phantomDisplay = dm.createVirtualDisplay("Phantom", width, height, density,
-                imageReader.getSurface(), DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR);
+                surfaceView.getHolder().getSurface(), DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR);
     }
 
     public void stop() {
