@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#0A0A1A">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔬 Threat Vector Analyzer"
+        android:textSize="24sp"
+        android:textColor="#00FFD1"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select libanogs.so to begin..."
+        android:textColor="#80FFFFFF"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btn_select_file"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="📂 Select libanogs.so"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/glass_button_bg"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/btn_start_analysis"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="⚡ Start Analysis"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/glass_button_bg"
+        android:layout_marginBottom="12dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        style="?android:attr/progressBarStyleHorizontal" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_offsets"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#05FFFFFF" />
+
+    <Button
+        android:id="@+id/btn_export_json"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="📤 Export as JSON"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/glass_button_bg"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

@@ -1,69 +1,62 @@
 package com.alol.overlay;
 
 import android.content.Context;
-import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import dalvik.system.DexClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IsolatedLabAnalyzer {
-    private static final String TAG = "LabAnalyzer";
-    private Context context;
-    private File isolatedDir;
+    private Context ctx;
+    public IsolatedLabAnalyzer(Context c) { this.ctx = c; }
 
-    public IsolatedLabAnalyzer(Context ctx) {
-        this.context = ctx;
-        isolatedDir = new File(ctx.getFilesDir(), "isolated_lab");
-        if (!isolatedDir.exists()) isolatedDir.mkdirs();
-    }
-
-    // تحميل libanogs.so من ملف APK اللعبة (يجب استخراجها أولاً)
-    public void loadAndAnalyze(String pathToLibAnogs) {
+    public List<ExtractorActivity.OffsetItem> analyzeFile(String path) {
+        List<ExtractorActivity.OffsetItem> results = new ArrayList<>();
         try {
-            // نسخ المكتبة إلى بيئتنا المعزولة
-            File libFile = new File(pathToLibAnogs);
-            File destFile = new File(isolatedDir, "libanogs.so");
-            copyFile(libFile, destFile);
+            File f = new File(path);
+            byte[] data = new byte[(int) f.length()];
+            FileInputStream fis = new FileInputStream(f);
+            fis.read(data);
+            fis.close();
 
-            // محاولة تحميل المكتبة باستخدام ClassLoader مخصص
-            System.load(destFile.getAbsolutePath());
-            Log.d(TAG, "libanogs loaded successfully in isolated environment");
+            // تحليل ELF بسيط: البحث عن الرموز
+            // هذا مثال مبسط - الواقع يتطلب تحليل ELF كامل
+            String[] knownSymbols = {
+                "AnoSDKInit", "AnoSDKGetReportData", "AnoSDKIoctl",
+                "AnoSDKOnRecvData", "AnoSDKRegistInfoListener", "AnoSDKDelReportData"
+            };
 
-            // هنا يمكن البحث عن الرموز عبر dlsym
-            String[] symbols = {"AnoSDKInit", "AnoSDKGetReportData", "AnoSDKIoctl"};
-            for (String sym : symbols) {
-                long addr = nativeFindSymbol(sym);
-                if (addr != 0) {
-                    Log.d(TAG, sym + " found at: 0x" + Long.toHexString(addr));
+            for (String sym : knownSymbols) {
+                byte[] pattern = sym.getBytes();
+                int found = indexOf(data, pattern);
+                if (found >= 0) {
+                    String offset = "0x" + Integer.toHexString(found);
+                    String threat = classifyThreat(sym);
+                    results.add(new ExtractorActivity.OffsetItem(sym, offset, pattern.length, threat));
                 }
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to load/analyze libanogs: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return results;
     }
 
-    private void copyFile(File src, File dst) throws IOException {
-        FileInputStream fis = new FileInputStream(src);
-        FileOutputStream fos = new FileOutputStream(dst);
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = fis.read(buf)) > 0) {
-            fos.write(buf, 0, len);
-        }
-        fis.close();
-        fos.close();
+    private String classifyThreat(String symbol) {
+        if (symbol.contains("Init") || symbol.contains("Ioctl")) return "🔥 CRITICAL";
+        if (symbol.contains("Report") || symbol.contains("Recv")) return "⚠️ HIGH";
+        if (symbol.contains("Del")) return "📋 MEDIUM";
+        return "ℹ️ LOW";
     }
 
-    private native long nativeFindSymbol(String symbol);
-
-    static {
-        try {
-            System.loadLibrary("isolated_lab");
-        } catch (UnsatisfiedLinkError e) {
-            Log.e(TAG, "Native library not found: " + e.getMessage());
+    private int indexOf(byte[] data, byte[] pattern) {
+        for (int i = 0; i <= data.length - pattern.length; i++) {
+            boolean match = true;
+            for (int j = 0; j < pattern.length; j++) {
+                if (data[i + j] != pattern[j]) { match = false; break; }
+            }
+            if (match) return i;
         }
+        return -1;
     }
 }

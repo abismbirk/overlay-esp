@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_cbg).setOnClickListener(this::onCbgClick);
         findViewById(R.id.btn_per).setOnClickListener(this::onPerClick);
         findViewById(R.id.btn_ibp).setOnClickListener(this::onIbpClick);
+        findViewById(R.id.btn_tva).setOnClickListener(v -> startActivity(new Intent(this, ExtractorActivity.class)));
     }
 
     // ========== معالجات الأزرار ==========
