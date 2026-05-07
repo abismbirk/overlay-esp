@@ -13,20 +13,20 @@
         android:label="Legion OS"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
+        <!-- الأنشطة -->
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- النشاط الجديد لتحليل الأوفستات -->
         <activity android:name=".ExtractorActivity" android:exported="false" />
+        <activity android:name=".LiveOffsetActivity" android:exported="false" />
 
+        <!-- الخدمات -->
         <service android:name=".PhantomMirrorService" 
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
-
         <service android:name=".PacketInterceptor" 
             android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE">
@@ -34,5 +34,6 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+        <service android:name=".ShadowServer" android:exported="false" />
     </application>
 </manifest>

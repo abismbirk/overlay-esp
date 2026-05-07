@@ -1,6 +1,7 @@
 package com.alol.overlay;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -9,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,20 +21,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // --- معالج الكراش العالمي ---
+        final Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable throwable) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(throwable.toString()).append("\n\n");
+                for (StackTraceElement ste : throwable.getStackTrace()) {
+                    sb.append(ste.toString()).append("\n");
+                }
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Crash Report")
+                    .setMessage(sb.toString())
+                    .setPositiveButton("Close", (d,w)-> System.exit(1))
+                    .show();
+                if (oldHandler != null) oldHandler.uncaughtException(thread, throwable);
+            }
+        });
+        // -------------------------
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.btn_acvs).setOnClickListener(this::onAcvsClick);
         findViewById(R.id.btn_eta).setOnClickListener(this::onEtaClick);
         findViewById(R.id.btn_vse).setOnClickListener(this::onVseClick);
-        findViewById(R.id.btn_rav).setOnClickListener(v -> Toast.makeText(this, "🛡️ Activated", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_ued).setOnClickListener(v -> Toast.makeText(this, "📚 Accessing database...", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_iga).setOnClickListener(v -> Toast.makeText(this, "🧠 Assistant started...", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_dae).setOnClickListener(v -> Toast.makeText(this, "💰 Entering market...", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_cbg).setOnClickListener(v -> Toast.makeText(this, "🤖 Factory booting...", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_per).setOnClickListener(v -> Toast.makeText(this, "💓 Scanning vitals...", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_ibp).setOnClickListener(v -> Toast.makeText(this, "♾️ Backup initialized", Toast.LENGTH_SHORT).show());
-        // زر المحلل الجديد
         findViewById(R.id.btn_tva).setOnClickListener(v -> startActivity(new Intent(this, LiveOffsetActivity.class)));
+
+        // باقي الأزرار (اختصار)
+        int[] ids = {R.id.btn_rav, R.id.btn_ued, R.id.btn_iga, R.id.btn_dae, R.id.btn_cbg, R.id.btn_per, R.id.btn_ibp};
+        String[] msgs = {"🛡️ Activated", "📚 Accessing...", "🧠 Assistant...", "💰 Market...", "🤖 Factory...", "💓 Vitals...", "♾️ Backup..."};
+        for (int i=0; i<ids.length; i++) {
+            final String msg = msgs[i];
+            findViewById(ids[i]).setOnClickListener(v -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show());
+        }
     }
 
     public void onAcvsClick(View v) {
