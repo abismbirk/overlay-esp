@@ -18,6 +18,7 @@ public class ShadowServer extends Service {
     private static final String TAG = "ShadowServer";
     private ServerSocket serverSocket;
     private boolean running = false;
+    public static LiveOffsetActivity liveActivity = null;
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
@@ -36,7 +37,8 @@ public class ShadowServer extends Service {
             getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
         Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pending = PendingIntent.getActivity(this, 0, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
+        PendingIntent pending = PendingIntent.getActivity(this, 0, intent,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
         startForeground(1, new Notification.Builder(this, channelId)
                 .setContentTitle("Shadow Server Active")
                 .setContentText("Listening on port 50051...")
@@ -67,6 +69,9 @@ public class ShadowServer extends Service {
             String line;
             while ((line = reader.readLine()) != null) {
                 Log.d(TAG, "Received: " + line);
+                if (liveActivity != null) {
+                    liveActivity.addData(line);
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Client error", e);

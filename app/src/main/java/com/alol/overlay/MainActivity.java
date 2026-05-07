@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_per).setOnClickListener(v -> Toast.makeText(this, "💓 Scanning vitals...", Toast.LENGTH_SHORT).show());
         findViewById(R.id.btn_ibp).setOnClickListener(v -> Toast.makeText(this, "♾️ Backup initialized", Toast.LENGTH_SHORT).show());
         // زر المحلل الجديد
-        findViewById(R.id.btn_tva).setOnClickListener(v -> startActivity(new Intent(this, ExtractorActivity.class)));
+        findViewById(R.id.btn_tva).setOnClickListener(v -> startActivity(new Intent(this, LiveOffsetActivity.class)));
     }
 
     public void onAcvsClick(View v) {
