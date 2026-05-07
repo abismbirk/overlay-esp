@@ -2,7 +2,6 @@ package com.alol.overlay;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -10,7 +9,6 @@ import android.view.Gravity;
 
 public class MainActivity extends Activity {
     private SystemUIParasite parasite;
-    private SurfaceView surfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,15 +22,11 @@ public class MainActivity extends Activity {
         info.setTextSize(18);
         layout.addView(info);
 
-        surfaceView = new SurfaceView(this);
-        surfaceView.setZOrderOnTop(true);
-        layout.addView(surfaceView, 800, 600);
-
         Button startBtn = new Button(this);
         startBtn.setText("Activate Phantom");
         startBtn.setOnClickListener(v -> {
             if (parasite == null) {
-                parasite = new SystemUIParasite(this, surfaceView);
+                parasite = new SystemUIParasite(this);
             }
         });
         layout.addView(startBtn);
