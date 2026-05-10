@@ -1,38 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <ScrollView
+    android:layout_height="match_parent"
+    android:background="#0A0A1A">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:paddingTop="60dp">
+
+        <!-- الشعار -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌐 Shadow Translator"
+            android:textSize="28sp"
+            android:textColor="#00FFD1"
+            android:textStyle="bold"
+            android:shadowColor="#00FFD1"
+            android:shadowRadius="20"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Live Audio Translation"
+            android:textSize="14sp"
+            android:textColor="#80FFFFFF"
+            android:layout_marginBottom="36dp" />
+
+        <!-- اختيار اللغات -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="24dp"
-            android:paddingTop="60dp">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tv_source_lang"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="English 🇺🇸"
+                android:textSize="16sp"
+                android:textColor="#FFF"
+                android:gravity="center"
+                android:padding="12dp"
+                android:background="@drawable/glass_button_bg" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LEGION OS"
-                android:textSize="38sp"
+                android:text=" → "
+                android:textSize="20sp"
                 android:textColor="#00FFD1"
-                android:textStyle="bold"
-                android:shadowColor="#00FFD1"
-                android:shadowRadius="25"
-                android:layout_marginBottom="36dp" />
-            <Button android:id="@+id/btn_tva" style="@style/GlassButton" android:text="🔬 Threat Vector Analyzer" />
-            <Button android:id="@+id/btn_acvs" style="@style/GlassButton" android:text="👁️ Phantom Eye (ACVS)" />
-            <Button android:id="@+id/btn_eta" style="@style/GlassButton" android:text="🌐 Packet Interceptor (ETA)" />
-            <Button android:id="@+id/btn_vse" style="@style/GlassButton" android:text="🧪 Virtual Sandbox (VSE)" />
-            <Button android:id="@+id/btn_rav" style="@style/GlassButton" android:text="🛡️ Self Armor (RAV)" />
-            <Button android:id="@+id/btn_ued" style="@style/GlassButton" android:text="📚 Exploit Database (UED)" />
-            <Button android:id="@+id/btn_iga" style="@style/GlassButton" android:text="🧠 Game Assistant (IGA)" />
-            <Button android:id="@+id/btn_dae" style="@style/GlassButton" android:text="💰 Shadow Market (DAE)" />
-            <Button android:id="@+id/btn_cbg" style="@style/GlassButton" android:text="🤖 Bot Factory (CBG)" />
-            <Button android:id="@+id/btn_per" style="@style/GlassButton" android:text="💓 Emotion Reader (PER)" />
-            <Button android:id="@+id/btn_ibp" style="@style/GlassButton" android:text="♾️ Immortality Backup (IBP)" />
+                android:layout_marginHorizontal="12dp" />
+
+            <TextView
+                android:id="@+id/tv_target_lang"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Arabic 🇸🇦"
+                android:textSize="16sp"
+                android:textColor="#FFF"
+                android:gravity="center"
+                android:padding="12dp"
+                android:background="@drawable/glass_button_bg" />
         </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+
+        <!-- زرار الترجمة الفورية -->
+        <Button
+            android:id="@+id/btn_live_translate"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="🎙️ START LIVE TRANSLATION"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="#FF00FFD1"
+            android:layout_marginBottom="16dp" />
+
+        <!-- باقي الميزات -->
+        <Button android:id="@+id/btn_file_translate" style="@style/GlassButton" android:text="📁 Translate Audio File" />
+        <Button android:id="@+id/btn_history" style="@style/GlassButton" android:text="📜 Translation History" />
+        <Button android:id="@+id/btn_saved" style="@style/GlassButton" android:text="⭐ Saved Words" />
+        <Button android:id="@+id/btn_settings" style="@style/GlassButton" android:text="⚙️ Settings" />
+
+        <!-- شريط الحالة -->
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🟢 Ready"
+            android:textColor="#80FFFFFF"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+</ScrollView>
