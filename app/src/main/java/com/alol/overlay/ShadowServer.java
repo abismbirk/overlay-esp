@@ -18,7 +18,6 @@ public class ShadowServer extends Service {
     private static final String TAG = "ShadowServer";
     private ServerSocket serverSocket;
     private boolean running = false;
-    public static LiveOffsetActivity liveActivity = null;
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
@@ -55,27 +54,22 @@ public class ShadowServer extends Service {
                 Log.d(TAG, "Server listening on port 50051");
                 while (running) {
                     Socket client = serverSocket.accept();
-                    new Thread(() -> handleClient(client)).start();
+                    new Thread(() -> {
+                        try {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                Log.d(TAG, "Received: " + line);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Client error", e);
+                        }
+                    }).start();
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Server error", e);
             }
         }).start();
-    }
-
-    private void handleClient(Socket client) {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Log.d(TAG, "Received: " + line);
-                if (liveActivity != null) {
-                    liveActivity.addData(line);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Client error", e);
-        }
     }
 
     @Override

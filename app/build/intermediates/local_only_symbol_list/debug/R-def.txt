@@ -1,0 +1,36 @@
+R_DEF: Internal format may change without notice
+local
+drawable glass_button_bg
+drawable ic_launcher
+id btn_acvs
+id btn_cbg
+id btn_copy
+id btn_dae
+id btn_eta
+id btn_export_json
+id btn_extract
+id btn_ibp
+id btn_iga
+id btn_per
+id btn_rav
+id btn_select_file
+id btn_start_analysis
+id btn_tab_live
+id btn_tab_manual
+id btn_tva
+id btn_ued
+id btn_upload
+id btn_vse
+id et_path
+id layout_live
+id layout_manual
+id lv_offsets
+id lv_results
+id progressBar
+id tv_status
+layout activity_extractor
+layout activity_live_offset
+layout activity_main
+string app_name
+style GlassButton
+xml accessibility_service_config
