@@ -25,13 +25,10 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_MEDIA_PROJECTION && resultCode == Activity.RESULT_OK) {
-            Intent serviceIntent = new Intent(this, TestForegroundService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            } else {
-                startService(serviceIntent);
-            }
-            Toast.makeText(this, "تم بدء الخدمة", Toast.LENGTH_SHORT).show();
+            Intent floatIntent = new Intent(this, FloatingTranslationService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(floatIntent);
+            else startService(floatIntent);
+            Toast.makeText(this, "النافذة العائمة تعمل الآن", Toast.LENGTH_SHORT).show();
         }
     }
 }
