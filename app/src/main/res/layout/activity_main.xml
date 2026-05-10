@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🌐 Shadow Translator"
+            android:text="🌐 المترجم الفوري"
             android:textSize="28sp"
             android:textColor="#00FFD1"
             android:textStyle="bold"
@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Live Audio Translation"
+            android:text="ترجمة الصوت من الفيديو مباشرة"
             android:textSize="14sp"
             android:textColor="#80FFFFFF"
             android:layout_marginBottom="36dp" />
@@ -65,7 +65,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Arabic 🇸🇦"
+                android:text="العربية 🇸🇦"
                 android:textSize="16sp"
                 android:textColor="#FFF"
                 android:gravity="center"
@@ -73,12 +73,12 @@
                 android:background="@drawable/glass_button_bg" />
         </LinearLayout>
 
-        <!-- زرار الترجمة الفورية -->
+        <!-- زر الترجمة الفورية -->
         <Button
             android:id="@+id/btn_live_translate"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="🎙️ START LIVE TRANSLATION"
+            android:text="🎙️ بدء الترجمة الفورية"
             android:textColor="#000"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -86,17 +86,17 @@
             android:layout_marginBottom="16dp" />
 
         <!-- باقي الميزات -->
-        <Button android:id="@+id/btn_file_translate" style="@style/GlassButton" android:text="📁 Translate Audio File" />
-        <Button android:id="@+id/btn_history" style="@style/GlassButton" android:text="📜 Translation History" />
-        <Button android:id="@+id/btn_saved" style="@style/GlassButton" android:text="⭐ Saved Words" />
-        <Button android:id="@+id/btn_settings" style="@style/GlassButton" android:text="⚙️ Settings" />
+        <Button android:id="@+id/btn_file_translate" style="@style/GlassButton" android:text="📁 ترجمة ملف صوتي" />
+        <Button android:id="@+id/btn_history" style="@style/GlassButton" android:text="📜 سجل الترجمات" />
+        <Button android:id="@+id/btn_saved" style="@style/GlassButton" android:text="⭐ الكلمات المحفوظة" />
+        <Button android:id="@+id/btn_settings" style="@style/GlassButton" android:text="⚙️ الإعدادات" />
 
         <!-- شريط الحالة -->
         <TextView
             android:id="@+id/tv_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🟢 Ready"
+            android:text="🟢 جاهز"
             android:textColor="#80FFFFFF"
             android:layout_marginTop="20dp" />
 

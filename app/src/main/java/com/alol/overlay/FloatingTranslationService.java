@@ -31,7 +31,7 @@ public class FloatingTranslationService extends Service {
 
     private void createOverlay() {
         overlayView = new TextView(this);
-        overlayView.setText("Waiting for translation...");
+        overlayView.setText("في انتظار الترجمة...");
         overlayView.setTextColor(Color.WHITE);
         overlayView.setBackgroundColor(Color.argb(180, 0, 0, 0));
         overlayView.setPadding(16, 8, 16, 8);

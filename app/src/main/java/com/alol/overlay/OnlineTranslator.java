@@ -45,10 +45,10 @@ public class OnlineTranslator {
                     response.append(line);
                 }
                 reader.close();
+                conn.disconnect();
 
                 String json = response.toString();
                 String translated = extractTranslation(json);
-
                 mainHandler.post(() -> callback.onTranslated(translated));
             } catch (Exception e) {
                 Log.e(TAG, "Translation error: " + e.getMessage());
@@ -58,14 +58,16 @@ public class OnlineTranslator {
     }
 
     private String extractTranslation(String json) {
-        int start = json.indexOf("\"") + 1;
-        if (start > 0) {
-            int end = json.indexOf("\"", start);
-            if (end > start) {
-                return json.substring(start, end);
+        try {
+            int start = json.indexOf("\"") + 1;
+            if (start > 0) {
+                int end = json.indexOf("\"", start);
+                if (end > start) {
+                    return json.substring(start, end);
+                }
             }
-        }
-        return "[Translation failed]";
+        } catch (Exception e) {}
+        return "[فشلت الترجمة]";
     }
 
     public void shutdown() {
