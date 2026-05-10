@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
             Intent floatIntent = new Intent(this, FloatingTranslationService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(floatIntent);
             else startService(floatIntent);
-            Toast.makeText(this, "النافذة العائمة تعمل الآن", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "تم بدء النافذة العائمة", Toast.LENGTH_SHORT).show();
         }
     }
 }
